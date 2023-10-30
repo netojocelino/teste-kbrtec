@@ -12,7 +12,7 @@
     <div class="row row-gap-3">
         <div class="col-12 form-group text-light">
             <label for="email">E-mail:</label>
-            <input type="email" class="form-control bg-dark border-dark text-light" id="email" placeholder="example@kbrtec.com.br" name="email" value="{{old('email')}}">
+            <input type="email" class="form-control bg-dark border-dark text-light" id="email" placeholder="example@kbrtec.com.br" name="email" value="{{old('email', request()->query('email'))}}">
             @error('email')
                 <small class="bg-danger rounded py-1 px-2 mt-1 d-block text-light">Um erro ocorreu: {{ $message  }}</small>
             @enderror
@@ -25,7 +25,7 @@
                 <small class="bg-danger rounded py-1 px-2 mt-1 d-block text-light">Um erro ocorreu: {{ $message  }}</small>
             @enderror
 
-            <a href="recuperar-senha.html" class="link-light"><small>Esqueci minha senha</small></a>
+            <a href="{{ route('reset-password') }}" class="link-light"><small>Esqueci minha senha</small></a>
         </div>
 
         <div class="col-12">
