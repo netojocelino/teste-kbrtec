@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
@@ -49,8 +50,19 @@ class AdminUserController extends Controller
         return view('admin.users.login');
     }
 
-    public function authenticate (Request $request)
+    public function authenticate (LoginRequest $request)
     {
+        $credentials = $request->validated();
+
+        if (!auth()->attempt($credentials))
+        {
+            return back()->withErrors([
+                'error' => __('auth.failed'),
+            ]);
+        }
+
+        auth()->user()->createToken(config('app.key'));
+
         return redirect()->route('admin.index');
     }
 
