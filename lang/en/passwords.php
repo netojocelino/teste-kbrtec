@@ -13,6 +13,8 @@ return [
     |
     */
 
+    'ask_for_reset' => 'Password Request',
+    'text_for_reset' => 'Use your new password and reset the password after the first login.',
     'reset' => 'Your password has been reset.',
     'sent' => 'We have emailed your password reset link.',
     'throttled' => 'Please wait before retrying.',

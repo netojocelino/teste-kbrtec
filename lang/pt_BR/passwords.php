@@ -13,10 +13,12 @@ return [
     |
     */
 
+    'ask_for_reset' => 'Pedido de nova senha',
+    'text_for_reset' => 'Use sua nova senha e altere após o primeiro login.',
     'reset' => 'Your password has been reset.',
     'sent' => 'We have emailed your password reset link.',
     'throttled' => 'Please wait before retrying.',
-    'token' => 'This password reset token is invalid.',
+    'token' => 'Seu token de senha é inválida.',
     'user' => "We can't find a user with that email address.",
 
 ];
