@@ -33,3 +33,6 @@ Route::post('/auth', [AdminUserController::class, 'authenticate'])->name('authen
 Route::get('/logout', [AdminUserController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('/reset-password', [AdminUserController::class, 'resetPassword'])->name('reset-password');
+Route::post('/request-password', [AdminUserController::class, 'requestPassword'])->name('request-new-password');
+Route::get('/reset-password/{token}', [AdminUserController::class, 'getResetPassword'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [AdminUserController::class, 'postResetPassord'])->name('update.reset-password');
