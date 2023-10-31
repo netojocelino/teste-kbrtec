@@ -24,11 +24,15 @@ class AdminUserController extends Controller
 
     public function index (Request $request)
     {
-        $user = (object) [
-            'name' => 'Jocelino',
-        ];
+        $search = request()->query();
+        $user = auth()->user();
+        $users = $this->userService->query($search)->paginate();
 
-        return view('admin.users.index', compact(['user']));
+        return view('admin.users.index', compact([
+            'user',
+            'users',
+            'search'
+        ]));
     }
 
     public function create (Request $request)
