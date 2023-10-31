@@ -88,7 +88,7 @@ O atleta possuirá uma área restrita por onde ele poderá logar e acessar todos
 
 
 
-Painel Administrativo:
+#### Painel Administrativo:
 
 - 1. Autenticação do Painel Administrativo:
     - a. Deverá haver autenticação para acessar esse sistema, ou seja, apenas usuários previamente cadastrados poderão realizar o login e ter acesso a essas funcionalidades restritas. Criar então funcionalidades de login, autenticação e recuperação de senha.
