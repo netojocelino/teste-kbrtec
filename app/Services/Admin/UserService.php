@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Exceptions\DuplicateRecord;
+use App\Exceptions\NotFoundRecord;
 use App\Models\User;
 
 class UserService
@@ -19,6 +20,11 @@ class UserService
         return $this->user->whereEmail($email)->first();
     }
 
+    public function findById (int $id)
+    {
+        return $this->user->find($id);
+    }
+
     public function store (array $data)
     {
         if ($this->findByEmail(data_get($data, 'email')))
@@ -33,6 +39,21 @@ class UserService
             'role'     => data_get($data, 'role'),
         ]);
 
+        return $user;
+    }
+
+    public function update (int $user_id, array $data)
+    {
+        if (!($user = $this->findById($user_id)))
+        {
+            throw new NotFoundRecord(__('validation.exists', ['attribute' => 'id de usuário']));
+        }
+        $user->fill(array_filter([
+            'name'     => data_get($data, 'name'),
+            'email'    => data_get($data, 'email'),
+            'password' => bcrypt(data_get($data, 'password')),
+        ]));
+        $user->save();
         return $user;
     }
 

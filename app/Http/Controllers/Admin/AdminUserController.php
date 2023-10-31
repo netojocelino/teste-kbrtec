@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\NewPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Services\Admin\UserService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -64,13 +65,32 @@ class AdminUserController extends Controller
         }
     }
 
-    public function edit (Request $request)
+    public function edit (Request $request, int $user_id)
     {
-        $user = (object) [
-            'name' => 'Jocelino',
-        ];
+        $user = $this->userService->findById($user_id);
 
         return view('admin.users.edit', compact(['user']));
+    }
+
+    public function update (UpdateUserRequest $request, int $user_id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = $this->userService->update($user_id, $request->validated());
+            DB::commit();
+
+            return redirect()->route('admin.users.index', [
+                'user' => $user->id,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors([
+                'message' => $th->getMessage(),
+            ])->withInput();
+        }
+
     }
 
     public function resetPassword (Request $request)
