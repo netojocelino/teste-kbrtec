@@ -19,7 +19,7 @@
             </svg>
         </a>
 
-        <a href="cadastrar.html" class="btn btn-light">+ Cadastrar Usuário</a>
+        <a href="{{ route('admin.users.create') }}" class="btn btn-light">+ Cadastrar Usuário</a>
     </div>
 </div>
 

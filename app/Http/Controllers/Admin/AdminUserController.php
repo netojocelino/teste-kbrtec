@@ -6,12 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\NewPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Services\Admin\UserService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 
 class AdminUserController extends Controller
 {
+    protected readonly UserService $userService;
+
+    public function __construct()
+    {
+        $this->userService = new UserService;
+    }
 
     public function index (Request $request)
     {
@@ -29,6 +38,26 @@ class AdminUserController extends Controller
         ];
 
         return view('admin.users.create', compact(['user']));
+    }
+
+    public function store (StoreUserRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = $this->userService->store($data = $request->validated());
+            DB::commit();
+
+            return redirect()->route('admin.users.index', [
+                'user' => $user->id,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors([
+                'message' => $th->getMessage(),
+            ])->withInput();
+        }
     }
 
     public function edit (Request $request)
