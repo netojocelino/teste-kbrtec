@@ -35,8 +35,8 @@ class UserService
         $user = $this->user->create([
             'name'     => data_get($data, 'name'),
             'email'    => data_get($data, 'email'),
-            'password' => data_get($data, 'password'),
-            'role'     => data_get($data, 'role'),
+            'password' => bcrypt(data_get($data, 'password')),
+            'role'     => data_get($data, 'role', 'visitor'),
         ]);
 
         return $user;
