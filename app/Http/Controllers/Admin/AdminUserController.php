@@ -6,20 +6,34 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\NewPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Services\Admin\UserService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 
 class AdminUserController extends Controller
 {
+    protected readonly UserService $userService;
+
+    public function __construct()
+    {
+        $this->userService = new UserService;
+    }
 
     public function index (Request $request)
     {
-        $user = (object) [
-            'name' => 'Jocelino',
-        ];
+        $search = request()->query();
+        $user = auth()->user();
+        $users = $this->userService->query($search)->paginate();
 
-        return view('admin.users.index', compact(['user']));
+        return view('admin.users.index', compact([
+            'user',
+            'users',
+            'search'
+        ]));
     }
 
     public function create (Request $request)
@@ -31,13 +45,52 @@ class AdminUserController extends Controller
         return view('admin.users.create', compact(['user']));
     }
 
-    public function edit (Request $request)
+    public function store (StoreUserRequest $request)
     {
-        $user = (object) [
-            'name' => 'Jocelino',
-        ];
+        DB::beginTransaction();
+
+        try {
+            $user = $this->userService->store($data = $request->validated());
+            DB::commit();
+
+            return redirect()->route('admin.users.index', [
+                'user' => $user->id,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors([
+                'message' => $th->getMessage(),
+            ])->withInput();
+        }
+    }
+
+    public function edit (Request $request, int $user_id)
+    {
+        $user = $this->userService->findById($user_id);
 
         return view('admin.users.edit', compact(['user']));
+    }
+
+    public function update (UpdateUserRequest $request, int $user_id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = $this->userService->update($user_id, $request->validated());
+            DB::commit();
+
+            return redirect()->route('admin.users.index', [
+                'user' => $user->id,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors([
+                'message' => $th->getMessage(),
+            ])->withInput();
+        }
+
     }
 
     public function resetPassword (Request $request)
