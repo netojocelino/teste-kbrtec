@@ -50,12 +50,12 @@
                     <div class="item">
                         <div
                             class="w-100 d-flex align-items-center gap-2 link-light text-decoration-none mt-2 py-3 px-3 border-light border-4 {{
-                                Helper::active(data_get($itemMenu, 'title.route_name'), data_get($itemMenu, 'title.class_true'))
+                                Helper::active(data_get($itemMenu, 'title.route_name'), data_get($itemMenu, 'title.class_true', 'border-start'))
                             }}"
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#{{ data_get($itemMenu, 'title.target')}}"
-                            aria-expanded="true"
+                            aria-expanded="{{ Helper::isActive(data_get($itemMenu, 'title.route_name')) ? 'true' : 'false' }}"
                             aria-controls="{{ data_get($itemMenu, 'title.target')}}"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
@@ -65,7 +65,9 @@
                             {{ data_get($itemMenu, 'title.title')}}
                         </div>
 
-                        <div class="collapse show" id="{{ data_get($itemMenu, 'title.target')}}">
+                        <div class="collapse  {{
+                                Helper::isActive(data_get($itemMenu, 'title.route_name')) ? 'show' : ''
+                            }}" id="{{ data_get($itemMenu, 'title.target')}}">
                             <div class="bg-dark d-flex flex-column rounded mx-4 p-2 row-gap-1">
 
                                 @foreach (data_get($itemMenu, 'menus', []) as $menu)
