@@ -180,6 +180,11 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'password' => 'password',
+        'title' => 'title',
+        'city_state' => 'City and State',
+        'championship' => 'Championship',
+    ],
 
 ];

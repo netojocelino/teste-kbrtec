@@ -182,6 +182,9 @@ return [
 
     'attributes' => [
         'password' => 'senha',
+        'title' => 'título',
+        'city_state' => 'cidade e estado',
+        'championship' => 'Campeonato',
     ],
 
 ];
