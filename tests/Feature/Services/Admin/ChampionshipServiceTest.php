@@ -51,7 +51,7 @@ class ChampionshipServiceTest extends TestCase
         $title      = 'Campeonato da equipe KBRTec';
         $city_state = 'Santos, São Paulo';
         $gym_place  = "Vila Mathias";
-        $date       = now()->addDays(2);
+        $date       = now()->addDays(2)->format('Y-m-d');
         Championship::factory()->create(compact([
             'title', 'city_state', 'gym_place', 'date'
         ]));
@@ -99,7 +99,7 @@ class ChampionshipServiceTest extends TestCase
         ]);
 
         $data = $service->list([
-            'title' => $title,
+            'name' => $title,
         ]);
 
         $this->assertCount(1, $data);

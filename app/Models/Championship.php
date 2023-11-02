@@ -25,7 +25,7 @@ class Championship extends Model
     ];
 
     protected $casts = [
-        'date' => 'date:Y-m-d 00:00:00',
+        'date' => 'date:Y-m-d',
     ];
 
     public function getDateFormatedAttribute ()
