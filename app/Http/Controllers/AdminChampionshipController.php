@@ -30,6 +30,17 @@ class AdminChampionshipController extends Controller
         ]));
     }
 
+    public function create ()
+    {
+        $user = auth()->user();
+        $states = State::get(['id', 'name']);
+
+        return view('admin.championship.create', compact([
+            'user',
+            'states',
+        ]));
+    }
+
     public function destroy (Request $request, int $id)
     {
         DB::beginTransaction();
