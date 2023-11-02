@@ -47,7 +47,9 @@ class ChampionshipService
 
     public function list (array $filter = [])
     {
-        return $this->query($filter)->paginate();
+        return $this->query($filter)
+            ->orderBy('date', 'desc')
+            ->paginate();
     }
 
     public function getById(int $id)
@@ -93,8 +95,13 @@ class ChampionshipService
     public function query (array $filter = [])
     {
         return $this->championship
-            ->when(!is_null(data_get($filter, 'title')), function ($when) use ($filter) {
-                return $when->where('title', 'LIKE', '%'.$filter['title'].'%');
+            ->when(!is_null(data_get($filter, 'name')), function ($when) use ($filter) {
+                return $when
+                    ->where('code', 'LIKE', '%'.$filter['name'].'%')
+                    ->orWhere('title', 'LIKE', '%'.$filter['name'].'%')
+                    ->orWhere('city_state', 'LIKE', '%'.$filter['name'].'%')
+                    ->orWhere('about', 'LIKE', '%'.$filter['name'].'%')
+                    ->orWhere('info', 'LIKE', '%'.$filter['name'].'%');
             });
     }
 

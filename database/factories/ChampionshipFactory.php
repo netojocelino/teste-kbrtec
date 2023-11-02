@@ -17,10 +17,10 @@ class ChampionshipFactory extends Factory
     public function definition(): array
     {
         return [
-            'code'            => $this->faker->asciify('****'),
+            'code'            => $this->faker->unique()->numerify('camp-#######'),
             'title'           => $this->faker->name(),
             'city_state'      => $this->faker->citySuffix(),
-            'date'            => $this->faker->date(),
+            'date'            => $this->faker->date('Y-m-d 00:00:00'),
             'about'           => $this->faker->text(),
             'gym_place'       => $this->faker->streetName(),
             'info'            => $this->faker->text(),

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\AdminChampionshipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,7 @@ Route::middleware('auth')->prefix('admin')->group(function ($routes) {
     Route::get('/', [AdminUserController::class, 'index'])->name('admin.index');
 
     Route::resource('users', AdminUserController::class)->except(['show',])->names('admin.users');
+    Route::resource('championships', AdminChampionshipController::class)->names('admin.championship');
 });
 
 Route::get('/login', [AdminUserController::class, 'login'])->name('login');

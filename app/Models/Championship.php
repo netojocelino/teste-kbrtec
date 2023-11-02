@@ -23,4 +23,13 @@ class Championship extends Model
         'phase',
         'active_status',
     ];
+
+    protected $casts = [
+        'date' => 'date:Y-m-d 00:00:00',
+    ];
+
+    public function getDateFormatedAttribute ()
+    {
+        return $this->date->format('Y, d ') . __($this->date->format('M'));
+    }
 }
