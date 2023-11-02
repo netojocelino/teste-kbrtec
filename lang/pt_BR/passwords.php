@@ -19,6 +19,6 @@ return [
     'sent' => 'We have emailed your password reset link.',
     'throttled' => 'Please wait before retrying.',
     'token' => 'Seu token de senha é inválida.',
-    'user' => "We can't find a user with that email address.",
+    'user' => "Não conseguimos encontrar um usuário com este endereço de email.",
 
 ];

@@ -21,9 +21,9 @@ Route::get('/', function () {
 
 
 Route::middleware('auth')->prefix('admin')->group(function ($routes) {
-    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/', [AdminUserController::class, 'index'])->name('admin.index');
 
-    Route::resource('users', AdminUserController::class)->except(['show',]);
+    Route::resource('users', AdminUserController::class)->except(['show',])->names('admin.users');
 });
 
 Route::get('/login', [AdminUserController::class, 'login'])->name('login');
