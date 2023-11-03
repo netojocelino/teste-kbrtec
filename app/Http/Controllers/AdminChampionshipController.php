@@ -73,6 +73,7 @@ class AdminChampionshipController extends Controller
             data_set($data, 'city_state', $city->name . " (".$state->abbr.")");
 
             $championship = $this->championshipService->store($data);
+            $championship->cover = $request->file('image');
 
             DB::commit();
             return redirect()->route('admin.championship.index');

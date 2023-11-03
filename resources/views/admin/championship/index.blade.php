@@ -87,7 +87,7 @@
                 <td>
                     <div class="d-flex flex-row gap-4">
                         <div>
-                            <img src="https://picsum.photos/seed/picsum/400/400" class="img-responsive" style="max-width: 100px;">
+                            <img src="{{ $item->cover }}" class="img-responsive" style="max-width: 100px;">
                         </div>
                         <div>
                             <p>{{ $item->title }}</p>

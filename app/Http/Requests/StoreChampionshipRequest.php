@@ -16,7 +16,7 @@ class StoreChampionshipRequest extends FormRequest
         return [
             'code'            => 'required|string|max:255',
             'title'           => 'required|string|max:255',
-            'image'           => 'nullable|string|max:255',
+            'image'           => 'required|file',
             'state_id'        => 'required|exists:states,id',
             'city_id'         => 'required|exists:cities,id',
             'date'            => 'required|date|max:255',
