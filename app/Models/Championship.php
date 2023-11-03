@@ -14,6 +14,8 @@ class Championship extends Model
         'code',
         'title',
         'city_state',
+        'city_id',
+        'state_id',
         'date',
         'about',
         'gym_place',

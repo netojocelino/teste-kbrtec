@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreChampionshipRequest;
+use App\Models\City;
 use App\Models\State;
 use App\Services\Admin\ChampionshipService;
 use Illuminate\Http\JsonResponse;
@@ -56,6 +58,30 @@ class AdminChampionshipController extends Controller
                 'error' => $th->getMessage(),
                 'code' => $th->getCode(),
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function store (StoreChampionshipRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $data = $request->validated();
+
+            $state = State::find($data['state_id'], ['name', 'abbr']);
+            $city = City::find($data['city_id'], ['name']);
+            data_set($data, 'city_state', $city->name . " (".$state->abbr.")");
+
+            $championship = $this->championshipService->store($data);
+
+            DB::commit();
+            return redirect()->route('admin.championship.index');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return back()->withInput()->withErrors([
+                'message' => $th->getMessage(),
+            ]);
         }
     }
 

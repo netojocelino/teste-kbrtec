@@ -91,12 +91,13 @@
                         </div>
                         <div>
                             <p>{{ $item->title }}</p>
-                            <span class="small text-white-50">
-                                {{ $item->gym_place }}
-                                &mdash;
+                            <div class="small text-white-50">
+                                {!! $item->gym_place !!}
+                            </div>
+                            <p class="small text-white-50">
                                 {{ $item->city_state }}
-                            </span>
-                            <p class="small text-white-50">{{ $item->info }}</p>
+                            </p>
+                            <div class="small text-white-50">{!! $item->info !!}</div>
                         </div>
                     </div>
                     {{ $item->email }}

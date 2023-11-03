@@ -31,6 +31,8 @@ class ChampionshipService
             'code'            => data_get($data, 'code'),
             'title'           => data_get($data, 'title'),
             'city_state'      => data_get($data, 'city_state'),
+            'city_id'         => data_get($data, 'city_id'),
+            'state_id'        => data_get($data, 'state_id'),
             'date'            => data_get($data, 'date'),
             'about'           => data_get($data, 'about'),
             'gym_place'       => data_get($data, 'gym_place'),
