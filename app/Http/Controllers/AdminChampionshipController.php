@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreChampionshipRequest;
+use App\Http\Requests\UpdateChampionshipRequest;
 use App\Models\City;
 use App\Models\State;
 use App\Services\Admin\ChampionshipService;
@@ -43,6 +44,17 @@ class AdminChampionshipController extends Controller
         ]));
     }
 
+    public function edit (int $id)
+    {
+        $championship = $this->championshipService->getById($id);
+        $user = auth()->user();
+
+        return view('admin.championship.edit', compact([
+            'championship',
+            'user',
+        ]));
+    }
+
     public function destroy (Request $request, int $id)
     {
         DB::beginTransaction();
@@ -77,6 +89,31 @@ class AdminChampionshipController extends Controller
 
             DB::commit();
             return redirect()->route('admin.championship.index');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return back()->withInput()->withErrors([
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function update (UpdateChampionshipRequest $request, int $championship_id)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
+
+            $championship = $this->championshipService->update($championship_id, $data);
+            if ($request->hasFile('image'))
+            {
+                $championship->cover = $request->file('image');
+            }
+
+            DB::commit();
+            return redirect()->route('admin.championship.edit', [
+                'championship' => $championship_id,
+            ]);
         } catch (\Throwable $th) {
             DB::rollBack();
 

@@ -30,7 +30,11 @@ return [
             [
                 'route_name' => 'admin.championship.index',
                 'item_name'  => 'Listagem',
-            ]
+            ],
+            [
+                'route_name' => 'admin.championship.create',
+                'item_name'  => 'Cadastrar',
+            ],
         ],
     ],
 

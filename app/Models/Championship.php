@@ -46,6 +46,11 @@ class Championship extends Model implements HasMedia
         return $this->date->format('Y, d ') . __($this->date->format('M'));
     }
 
+    public function getDateInputAttribute ()
+    {
+        return $this->date->format('Y-m-d');
+    }
+
     public function getCoverAttribute ()
     {
         return $this->getFirstMediaUrl('cover');

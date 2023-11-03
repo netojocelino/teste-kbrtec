@@ -8,7 +8,7 @@
 @section('content')
 
 <div class="d-flex align-items-end justify-content-between mb-4">
-    <h1 class="h3">Cadastrar Usuário</h1>
+    <h1 class="h3">Cadastrar Campeonato</h1>
 
     <a href="painel.html" class="btn btn-light">Voltar</a>
 </div>
