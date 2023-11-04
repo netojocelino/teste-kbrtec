@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Exceptions\InvalidAttributeUpdateException;
+use App\Exceptions\InvalidFeatureQuantityException;
 use App\Exceptions\NotFoundRecord;
 use App\Models\Championship;
 
@@ -111,6 +112,15 @@ class ChampionshipService
                 'attribute' => 'championship',
             ]));
         }
+
+        if ($this->countFeatures() >= 8)
+        {
+            throw new InvalidFeatureQuantityException(__('validation.max.numeric', [
+                'attribute' => 'feature',
+                'max'       => 8,
+            ]));
+        }
+
         $isFeature = !!$championship->feature_order;
 
         if ($isFeature) {

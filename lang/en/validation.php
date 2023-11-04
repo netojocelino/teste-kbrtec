@@ -185,6 +185,7 @@ return [
         'title' => 'title',
         'city_state' => 'City and State',
         'championship' => 'Championship',
+        'feature' => 'feature',
     ],
 
 ];

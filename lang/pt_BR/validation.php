@@ -91,7 +91,7 @@ return [
     'max' => [
         'array' => 'The :attribute field must not have more than :max items.',
         'file' => 'The :attribute field must not be greater than :max kilobytes.',
-        'numeric' => 'The :attribute field must not be greater than :max.',
+        'numeric' => ':attribute não pode ser maior que :max.',
         'string' => 'The :attribute field must not be greater than :max characters.',
     ],
     'max_digits' => 'The :attribute field must not have more than :max digits.',
@@ -185,6 +185,7 @@ return [
         'title' => 'título',
         'city_state' => 'cidade e estado',
         'championship' => 'Campeonato',
+        'feature' => 'destaque',
     ],
 
 ];
