@@ -28,6 +28,12 @@ class ChampionshipService
             ]));
         }
 
+        if ($this->checkIfCodeAlreadyExists($data)) {
+            throw new \App\Exceptions\DuplicateRecord(__('validation.unique', [
+                'attribute' => 'code',
+            ]));
+        }
+
         $championship = $this->championship->create([
             'code'            => data_get($data, 'code'),
             'title'           => data_get($data, 'title'),
@@ -156,6 +162,13 @@ class ChampionshipService
             'city_state' => data_get($data, 'city_state'),
             'date'       => data_get($data, 'date'),
             'gym_place'  => data_get($data, 'gym_place'),
+        ])->exists();
+    }
+
+    public function checkIfCodeAlreadyExists (array $data)
+    {
+        return $this->championship->where([
+            'code'  => data_get($data, 'code'),
         ])->exists();
     }
 
