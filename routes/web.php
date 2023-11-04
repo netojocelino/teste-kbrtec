@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AdminChampionshipController;
+use App\Http\Controllers\AthleteDashboardController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,10 +18,11 @@ use App\Http\Controllers\AdminChampionshipController;
 |
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/torneios', [HomeController::class, 'championships'])->name('home.championships');
+Route::get('/torneios/{championship}', [HomeController::class, 'showChampionship'])->name('home.championships.show');
 
+Route::resource('home', HomeController::class)->names('home');
 
 Route::middleware('auth')->prefix('admin')->group(function ($routes) {
     Route::get('/', [AdminUserController::class, 'index'])->name('admin.index');

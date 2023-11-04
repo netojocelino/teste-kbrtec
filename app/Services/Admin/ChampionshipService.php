@@ -58,7 +58,7 @@ class ChampionshipService
     {
         return $this->query($filter)
             ->orderBy('date', 'desc')
-            ->paginate();
+            ->paginate($perPage);
     }
 
     public function getById(int $id)
@@ -146,12 +146,22 @@ class ChampionshipService
     {
         return $this->championship
             ->when(!is_null(data_get($filter, 'name')), function ($when) use ($filter) {
-                return $when
-                    ->where('code', 'LIKE', '%'.$filter['name'].'%')
-                    ->orWhere('title', 'LIKE', '%'.$filter['name'].'%')
-                    ->orWhere('city_state', 'LIKE', '%'.$filter['name'].'%')
-                    ->orWhere('about', 'LIKE', '%'.$filter['name'].'%')
-                    ->orWhere('info', 'LIKE', '%'.$filter['name'].'%');
+                return $when->where(function ($subwhere) use ($filter) {
+                    return $subwhere->where('code', 'LIKE', '%'.$filter['name'].'%')
+                        ->orWhere('title', 'LIKE', '%'.$filter['name'].'%')
+                        ->orWhere('about', 'LIKE', '%'.$filter['name'].'%')
+                        ->orWhere('info', 'LIKE', '%'.$filter['name'].'%');
+                });
+            })
+            ->when(!is_null(data_get($filter, 'local')), function ($when) use ($filter) {
+                $search = array_reduce($filter['local'], fn ($ac, $value) => $ac.$value.'%','%');
+                return $when->where('city_state', 'LIKE', $search);
+            })
+            ->when(data_get($filter, 'championship_active', false), function ($when) use ($filter) {
+                return $when->where('phase', '<>', 'Resultado');
+            })
+            ->when(!is_null(data_get($filter, 'type')), function ($when) use ($filter) {
+                return $when->where('type', $filter['type']);
             });
     }
 

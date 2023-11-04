@@ -54,7 +54,7 @@ class Championship extends Model implements HasMedia
 
     public function getCoverAttribute ()
     {
-        return $this->getFirstMediaUrl('cover');
+        return $this->getFirstMediaUrl('cover') ?: asset('/img/logo.svg');
     }
 
     public function setCoverAttribute (UploadedFile $img)

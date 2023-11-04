@@ -29,7 +29,7 @@ class ChampionshipFactory extends Factory
             'info'            => $this->faker->text(),
             'public_entrance' => $this->faker->text(),
             'type'            => $this->faker->randomElement(['Kimono', 'No-Gi']),
-            'phase'           => $this->faker->randomElement(['Inscrições Abertas', 'Chaves de Lutas', 'Resultados']),
+            'phase'           => $this->faker->randomElement(['open_register', 'fighting', 'finished']),
             'active_status'   => $this->faker->boolean(),
         ];
     }
