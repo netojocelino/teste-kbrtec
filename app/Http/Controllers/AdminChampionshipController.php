@@ -123,4 +123,36 @@ class AdminChampionshipController extends Controller
         }
     }
 
+    public function listFeatures (Request $request)
+    {
+        $championships = $this->championshipService->features();
+        $user = auth()->user();
+
+        return view('admin.championship.features.index', compact([
+            'championships',
+            'user',
+        ]));
+    }
+
+
+    public function updateFeatures (Request $request, int $championship_id )
+    {
+        DB::beginTransaction();
+
+        try {
+            $championship = $this->championshipService->changeFeature($championship_id);
+
+            DB::commit();
+            return response()->json([
+                'isFeature' => (bool)$championship->feature_order,
+            ], JsonResponse::HTTP_OK);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => $th->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

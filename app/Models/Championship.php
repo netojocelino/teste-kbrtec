@@ -27,6 +27,7 @@ class Championship extends Model implements HasMedia
         'type',
         'phase',
         'active_status',
+        'feature_order',
     ];
 
     protected $casts = [

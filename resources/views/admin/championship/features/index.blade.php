@@ -23,50 +23,6 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-end mb-3">
-    <form action="" class="bg-custom rounded col-12 py-3 px-4" method="GET">
-
-        <div class="row align-items-end row-gap-4">
-            <div class="col-3 d-flex flex-wrap">
-                <label for="search" class="col-form-label">Buscar:</label>
-                <div class="col-12">
-                    <input type="text" name="name" class="form-control bg-dark text-light border-dark" id="search" placeholder="Ex: Admin" value="{{ data_get($search, 'name') }}">
-                </div>
-            </div>
-
-            <div class="col-3 d-flex flex-wrap">
-                <label for="status" class="col-form-label">Status:</label>
-                <div class="col-12">
-                    <select name="status" class="form-control bg-dark text-light border-dark form-select" id="status">
-                        <option value="" disabled selected>Selecione</option>
-                        <option @selected(data_get($search, 'status') == 'true') value="true">Ativado</option>
-                        <option @selected(data_get($search, 'status') == 'false') value="false">Desativado</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-5 row">
-                <div class="col-12 col-form-label">Data:</div>
-
-                <div class="col-6 d-flex gap-2">
-                    <label for="de" class="col-form-label">De:</label>
-                    <input type="date" class="form-control bg-dark text-light border-dark" id="date_from" name="date_from" placeholder="27/10/2023" value="{{ data_get($search, 'date_from') }}">
-                </div>
-
-                <div class="col-6 d-flex gap-2">
-                    <label for="ate" class="col-form-label">Até:</label>
-                    <input type="date" class="form-control bg-dark text-light border-dark" id="date_to" name="date_to" placeholder="27/10/2023" value="{{ data_get($search, 'date_to') }}">
-                </div>
-            </div>
-
-            <div class="col d-flex justify-content-end">
-                <button type="submit" class="btn btn-light w-100">Filtrar</button>
-            </div>
-        </div>
-    </form>
-</div>
-
-
 <div class="bg-custom rounded overflow-hidden">
     <table class="table mb-0 table-custom table-dark align-middle">
         <thead>
@@ -108,6 +64,8 @@
                 <td>
                     <div class="d-flex justify-content-center">
 
+
+
                     @if ($item->feature_order)
                         <button type="button" class="btn btn-light d-flex justify-content-center align-items-center rounded-circle p-2 mx-2" title="Marcar como destaque" data-feature-on="{{ $item->id }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-star-fill" viewBox="0 0 16 16">
@@ -122,6 +80,10 @@
                               </svg>
                         </button>
                     @endif
+
+
+
+
 
                         <a href="{{ route('admin.championship.edit', ['championship' => $item->id]) }}" class="btn btn-light d-flex justify-content-center align-items-center rounded-circle p-2 mx-2" title="Editar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
@@ -144,8 +106,6 @@
         </tbody>
     </table>
 </div>
-
-@include('pagination', ['paginator' => $championships])
 
 @endsection
 

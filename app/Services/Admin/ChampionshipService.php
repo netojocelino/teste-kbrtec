@@ -93,6 +93,38 @@ class ChampionshipService
         return $championship->delete();
     }
 
+    public function countFeatures ()
+    {
+        return $this->championship->whereNotNull('feature_order')->count();
+    }
+
+    public function features ()
+    {
+        return $this->championship->whereNotNull('feature_order')->get();
+    }
+
+    public function changeFeature (int $championship_id)
+    {
+        if (!($championship = $this->getById($championship_id)))
+        {
+            throw new NotFoundRecord(__('validation.exists', [
+                'attribute' => 'championship',
+            ]));
+        }
+        $isFeature = !!$championship->feature_order;
+
+        if ($isFeature) {
+            $championship->update([
+                'feature_order' => null,
+            ]);
+        } else {
+            $championship->update([
+                'feature_order' => $this->countFeatures() + 1,
+            ]);
+        }
+
+        return $championship;
+    }
 
     public function query (array $filter = [])
     {

@@ -35,6 +35,10 @@ return [
                 'route_name' => 'admin.championship.create',
                 'item_name'  => 'Cadastrar',
             ],
+            [
+                'route_name' => 'admin.championship.features.index',
+                'item_name'  => 'Destaques',
+            ],
         ],
     ],
 

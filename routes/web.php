@@ -25,7 +25,15 @@ Route::middleware('auth')->prefix('admin')->group(function ($routes) {
     Route::get('/', [AdminUserController::class, 'index'])->name('admin.index');
 
     Route::resource('users', AdminUserController::class)->except(['show',])->names('admin.users');
-    Route::resource('championships', AdminChampionshipController::class)->names('admin.championship');
+    Route::resource('championships', AdminChampionshipController::class)->names('admin.championship')
+        ->where([
+            'championship' => '[0-9]+'
+        ]);
+
+    Route::prefix('championships/features')->group(function ($route) {
+        Route::get('/', [AdminChampionshipController::class, 'listFeatures'])->name('admin.championship.features.index');
+        Route::put('/{championship}', [AdminChampionshipController::class, 'updateFeatures'])->name('admin.championship.features.update');
+    });
 });
 
 Route::get('/login', [AdminUserController::class, 'login'])->name('login');
