@@ -19,4 +19,9 @@ class Helpers
 
         return (str_contains($currentRouter, $routeNameCompare) || $currentRouter === $routeNameCompare);
     }
+
+    public static function onlyNumbers (string $document_number)
+    {
+        return preg_replace('/\D+/', '', $document_number);
+    }
 }
