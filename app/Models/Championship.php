@@ -44,7 +44,7 @@ class Championship extends Model implements HasMedia
 
     public function getDateFormatedAttribute ()
     {
-        return $this->date->format('Y, d ') . __($this->date->format('M'));
+        return $this->date->format('Y, d ') . substr(__($this->date->format('M')), 0, 3);
     }
 
     public function getDateInputAttribute ()

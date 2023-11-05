@@ -11,10 +11,14 @@ class ChampionshipService
 {
 
     protected readonly Championship $championship;
+    protected readonly AthleteService $athleteService;
+    protected readonly CompetitorService $competitorService;
 
     public function __construct ()
     {
         $this->championship = new Championship;
+        $this->athleteService = new AthleteService;
+        $this->competitorService = new CompetitorService;
     }
 
     public function store (array $data = [])
@@ -54,7 +58,7 @@ class ChampionshipService
     }
 
 
-    public function list (array $filter = [])
+    public function list (array $filter = [], int $perPage = null)
     {
         return $this->query($filter)
             ->orderBy('date', 'desc')
@@ -64,6 +68,11 @@ class ChampionshipService
     public function getById(int $id)
     {
         return $this->championship->find($id);
+    }
+
+    public function getByCode(string $code)
+    {
+        return $this->championship->where('code', $code)->first();
     }
 
     public function update(int $championship_id, array $data)
@@ -180,6 +189,15 @@ class ChampionshipService
         return $this->championship->where([
             'code'  => data_get($data, 'code'),
         ])->exists();
+    }
+
+
+    public function registerCompetitor (array $data, Championship $championship)
+    {
+        $athlete = $this->athleteService->store($data);
+        $competitor = $this->competitorService->store($athlete, $championship);
+
+        return $competitor;
     }
 
 }

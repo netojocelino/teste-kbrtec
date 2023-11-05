@@ -4,7 +4,10 @@ namespace Tests\Feature\Services\Admin;
 
 use App\Exceptions\DuplicateRecord;
 use App\Exceptions\InvalidAttributeUpdateException;
+use App\Helpers\Helpers;
+use App\Models\Athlete;
 use App\Models\Championship;
+use App\Models\Competitor;
 use App\Services\Admin\ChampionshipService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -176,6 +179,62 @@ class ChampionshipServiceTest extends TestCase
         $this->assertDatabaseCount(Championship::class, 1);
         $this->assertDatabaseMissing(Championship::class, $champ->toArray());
         $this->assertTrue($isDeleted);
+    }
+
+    public function testMustRegisterACompetitorForAChampionship(): void
+    {
+        $service = new ChampionshipService;
+        $athlete = Athlete::factory()->make([])->toArray();
+        $championship = Championship::factory()->create([
+            'title'      => 'Campeonato da KBRTec',
+            'city_state' => 'Santos (SP)',
+            'phase'      => 'open_register',
+        ]);
+
+        $service->registerCompetitor($athlete, $championship);
+
+        $championshipExpected = [
+            'code'            => $championship->code,
+            'title'           => $championship->title,
+            'city_state'      => $championship->city_state,
+            'city_id'         => $championship->city_id,
+            'state_id'        => $championship->state_id,
+            'date'            => $championship->date,
+            'about'           => $championship->about,
+            'gym_place'       => $championship->gym_place,
+            'info'            => $championship->info,
+            'public_entrance' => $championship->public_entrance,
+            'type'            => $championship->type,
+            'phase'           => $championship->phase,
+            'active_status'   => $championship->active_status,
+            'feature_order'   => $championship->feature_order,
+        ];
+        $athleteExpected = [
+            'code'            => $athlete['code'],
+            'full_name'       => $athlete['full_name'],
+            'birthdate'       => $athlete['birthdate'],
+            'document_number' => Helpers::onlyNumbers($athlete['document_number']),
+            'team'            => $athlete['team'],
+            'gender'          => $athlete['gender'],
+            'belt'            => $athlete['belt'],
+            'weight'          => $athlete['weight'],
+            'email'           => $athlete['email'],
+        ];
+        $competitorExpected = [
+            'belt'   => $athlete['belt'],
+            'weight' => $athlete['weight'],
+            'team'   => $athlete['team'],
+
+            'championship_id' => $championship->id,
+            // 'athlete_id'      => $athlete->id,
+        ];
+
+        $this->assertDatabaseHas(Championship::class, $championshipExpected);
+        $this->assertDatabaseCount(Championship::class, 1);
+        $this->assertDatabaseHas(Athlete::class, $athleteExpected);
+        $this->assertDatabaseCount(Athlete::class, 1);
+        $this->assertDatabaseHas(Competitor::class, $competitorExpected);
+        $this->assertDatabaseCount(Competitor::class, 1);
     }
 
 }

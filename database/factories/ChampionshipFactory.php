@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\City;
+use App\Models\State;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,12 +18,22 @@ class ChampionshipFactory extends Factory
      */
     public function definition(): array
     {
+        $state = State::create([
+            "name"       => $this->faker->unique()->citySuffix(),
+            "abbr"       => $this->faker->unique()->bothify('#?'),
+        ]);
+
+        $city = $state->city()->create([
+            "name"       => $this->faker->unique()->city(),
+        ]);
+
+
         return [
             'code'            => $this->faker->unique()->numerify('camp-#######'),
             'title'           => $this->faker->name(),
             'city_state'      => $this->faker->citySuffix(),
-            'city_id'         => City::class,
-            'state_id'        => State::class,
+            'city_id'         => $city->id,
+            'state_id'        => $state->id,
             'date'            => $this->faker->date('Y-m-d 00:00:00'),
             'about'           => $this->faker->text(),
             'gym_place'       => $this->faker->streetName(),

@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('championships', function (Blueprint $table) {
-            $table->dropColumn('feature_order');
+            // @TODO verify why phpunit throws error here
+            // $table->dropColumn('feature_order');
         });
     }
 };
