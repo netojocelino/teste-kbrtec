@@ -78,9 +78,9 @@ Esta área deverá conter os seguintes elementos:
 
 4. **Área do Atleta**:
 
-O atleta possuirá uma área restrita por onde ele poderá logar e acessar todos os seus certificados, um por cada campeonato em que se inscrever. Sendo assim:
-* Deverá haver o recurso completo de login e autenticação desta área.
-* Haverá 2 tipos de certificado e sua exibição deverá ser feita dinamicamente:
+    O atleta possuirá uma área restrita por onde ele poderá logar e acessar todos os seus certificados, um por cada campeonato em que se inscrever. Sendo assim:
+    * Deverá haver o recurso completo de login e autenticação desta área.
+    * Haverá 2 tipos de certificado e sua exibição deverá ser feita dinamicamente:
     * Certificado de Participação: Para atletas que participaram e não venceram.
     * Certificado de Vitória: Para atletas que foram ao pódio, ou seja, se classificam em 1º, 2º ou em 3º lugar.
         * Notar que download de front-end que disponibilizamos existem estes dois certificados com as frases distintas. Validar para que seja exibida a frase correta para o atleta de acordo com a sua participação em cada campeonato.

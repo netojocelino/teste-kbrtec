@@ -90,7 +90,6 @@ class AdminUserController extends Controller
                 'message' => $th->getMessage(),
             ])->withInput();
         }
-
     }
 
     public function resetPassword (Request $request)
@@ -139,6 +138,43 @@ class AdminUserController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    public function profile (Request $request)
+    {
+        $user = auth()->user();
+
+        return view('admin.users.profile', compact([
+            'user',
+        ]));
+    }
+
+    public function postProfile (UpdateUserRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = auth()->user();
+
+            $this->userService->update($user->id, $request->validated());
+            DB::commit();
+
+            return redirect()->route('profile')->with([
+                'success' => 'Perfil atualizado com sucesso.',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => $th->getMessage(),
+                'trace'   => $th->getTrace(),
+            ]);
+
+            return redirect()->back()->withErrors([
+                'message' => $th->getMessage(),
+            ])->withInput();
+        }
+
     }
 
     public function getResetPassword (string $token)
