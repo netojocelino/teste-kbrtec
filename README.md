@@ -1,3 +1,18 @@
+## Testar
+
+Para testar é necessário ter instalado o PHP e um banco de dados
+
+Caso tenha `docker` instalado basta iniciar - após atribuir as configurações do arquivo `.env`
+e executar a migração dos dados.
+
+```
+./vendor/bin/sail migrate # para executar as migrações
+
+./vendor/bin/sail up -d # para iniciar o servidor
+
+./vendor/bin/sail artisan test --testdox # para executar os testes
+```
+
 ## Escopo
 
 
