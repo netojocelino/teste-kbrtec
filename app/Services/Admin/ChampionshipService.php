@@ -74,6 +74,27 @@ class ChampionshipService
         return $this->championship->with($with)->find($id);
     }
 
+    public function getGroupsById(int $championship_id, array $filter = [])
+    {
+        return $this->competitorGroup
+            ->where('championship_id', $championship_id)
+            ->when(!is_null(data_get($filter, 'belt')), function ($when) use ($filter) {
+                if ($filter['belt'] == 'marrom') {
+                    return $when->where('belt', 'brown');
+                } elseif ($filter['belt'] == 'preta') {
+                    return $when->where('belt', 'black');
+                }
+            })
+            ->orderBy('match_level', 'ASC')
+            ->orderBy('match_number', 'ASC')
+            ->with([
+                'firstAthlete',
+                'secondAthlete',
+            ])
+            ->get()
+            ;
+    }
+
     public function getByCode(string $code)
     {
         return $this->championship->where('code', $code)->first();

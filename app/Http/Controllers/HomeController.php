@@ -46,6 +46,34 @@ class HomeController extends Controller
         ]));
     }
 
+    public function showChampionshipPhases(Request $request, int $championship_id)
+    {
+        $championship = $this->championshipService->getById($championship_id);
+        $championshipGroups = $this->championshipService->getGroupsById($championship_id, $request->query());
+
+        return view('athletes.admin.phases', compact([
+            'championship',
+            'championshipGroups',
+        ]));
+    }
+
+    public function showChampionshipPhasesDetails(Request $request, int $championship_id, string $belt, string $weight, string $gender)
+    {
+        $championship = $this->championshipService->getById($championship_id);
+        $championshipGroup = $this->championshipService->getGroupsById($championship_id, compact([
+            'belt',
+            'weight',
+            'gender',
+        ]));
+
+        // dd($championshipGroup);
+
+        return view('athletes.admin.view', compact([
+            'championship',
+            'championshipGroup',
+        ]));
+    }
+
     public function registerChampionship(string $championship)
     {
         $championship = $this->championshipService->getByCode($championship);

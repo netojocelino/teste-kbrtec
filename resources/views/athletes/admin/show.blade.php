@@ -170,7 +170,7 @@ x-data="{active:'sobre_evento'}"
 @elseif($championship->phase == 'fighting')
 <div class="mt-8 flex justify-center">
   <a
-    href="./chave_listagem.html"
+    href="{{ route('home.championships.phases', ['championship' => $championship->id]) }}"
     class="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-lg px-5 py-2.5 mr-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 focus:outline-none dark:focus:ring-yellow-800"
   >
     Fique por dentro do chaveamento

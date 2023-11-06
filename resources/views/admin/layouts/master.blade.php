@@ -31,7 +31,7 @@
 
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item text-end" href="#">
+                            <a class="dropdown-item text-end" href="{{ route('profile') }}">
                                 <small>Alterar Senha</small>
                             </a>
                             <a class="dropdown-item text-end" href="{{ route('logout') }}">
