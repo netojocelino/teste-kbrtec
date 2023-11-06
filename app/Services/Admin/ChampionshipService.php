@@ -6,17 +6,21 @@ use App\Exceptions\InvalidAttributeUpdateException;
 use App\Exceptions\InvalidFeatureQuantityException;
 use App\Exceptions\NotFoundRecord;
 use App\Models\Championship;
+use App\Models\CompetitorGroups;
+use Illuminate\Support\Str;
 
 class ChampionshipService
 {
 
     protected readonly Championship $championship;
+    protected readonly CompetitorGroups $competitorGroup;
     protected readonly AthleteService $athleteService;
     protected readonly CompetitorService $competitorService;
 
     public function __construct ()
     {
         $this->championship = new Championship;
+        $this->competitorGroup = new CompetitorGroups;
         $this->athleteService = new AthleteService;
         $this->competitorService = new CompetitorService;
     }
@@ -28,18 +32,18 @@ class ChampionshipService
         // use throw_if()?
         if ($alreadyExistsChampionship) {
             throw new \App\Exceptions\DuplicateRecord(__('validation.unique', [
-                'attribute' => 'title',
+                'attribute' => __('validation.attributes.title'),
             ]));
         }
 
         if ($this->checkIfCodeAlreadyExists($data)) {
             throw new \App\Exceptions\DuplicateRecord(__('validation.unique', [
-                'attribute' => 'code',
+                'attribute' => __('validation.attributes.code'),
             ]));
         }
 
         $championship = $this->championship->create([
-            'code'            => data_get($data, 'code'),
+            'code'            => Str::slug(data_get($data, 'code') ?: data_get($data, 'title')),
             'title'           => data_get($data, 'title'),
             'city_state'      => data_get($data, 'city_state'),
             'city_id'         => data_get($data, 'city_id'),
@@ -65,9 +69,9 @@ class ChampionshipService
             ->paginate($perPage);
     }
 
-    public function getById(int $id)
+    public function getById(int $id, array $with = [])
     {
-        return $this->championship->find($id);
+        return $this->championship->with($with)->find($id);
     }
 
     public function getByCode(string $code)
@@ -80,14 +84,14 @@ class ChampionshipService
         if (!($championship = $this->getById($championship_id)))
         {
             throw new NotFoundRecord(__('validation.exists', [
-                'attribute' => 'championship',
+                'attribute' => __('validation.attributes.championship'),
             ]));
         }
 
         if (in_array('code', array_keys($data)))
         {
             throw new InvalidAttributeUpdateException(__('validation.prohibited', [
-                'attribute' => 'code',
+                'attribute' => __('validation.attributes.code'),
             ]));
         }
 
@@ -102,7 +106,7 @@ class ChampionshipService
         if (!($championship = $this->getById($championship_id)))
         {
             throw new NotFoundRecord(__('validation.exists', [
-                'attribute' => 'championship',
+                'attribute' => __('validation.attributes.championship'),
             ]));
         }
 
@@ -124,14 +128,14 @@ class ChampionshipService
         if (!($championship = $this->getById($championship_id)))
         {
             throw new NotFoundRecord(__('validation.exists', [
-                'attribute' => 'championship',
+                'attribute' => __('validation.attributes.championship'),
             ]));
         }
 
         if ($this->countFeatures() >= 8)
         {
             throw new InvalidFeatureQuantityException(__('validation.max.numeric', [
-                'attribute' => 'feature',
+                'attribute' => __('validation.attributes.feature'),
                 'max'       => 8,
             ]));
         }
@@ -191,6 +195,36 @@ class ChampionshipService
         ])->exists();
     }
 
+    public function startFighting (int $championship_id)
+    {
+        if (!($championship = $this->getById($championship_id)))
+        {
+            throw new NotFoundRecord(__('validation.exists', [
+                'attribute' => __('validation.attributes.championship'),
+            ]));
+        }
+
+        $this->registerCompetitorToRandomGroup($championship);
+
+        $championship->update([ 'phase' => 'fighting', ]);
+        return $championship->with([
+            'groups',
+        ]);
+    }
+
+    public function endsCompetition (int $championship_id)
+    {
+        if (!($championship = $this->getById($championship_id)))
+        {
+            throw new NotFoundRecord(__('validation.exists', [
+                'attribute' => __('validation.attributes.championship'),
+            ]));
+        }
+
+        $championship->update([ 'phase' => 'finished', ]);
+        return $championship;
+    }
+
 
     public function registerCompetitor (array $data, Championship $championship)
     {
@@ -198,6 +232,39 @@ class ChampionshipService
         $competitor = $this->competitorService->store($athlete, $championship);
 
         return $competitor;
+    }
+
+    public function registerCompetitorToRandomGroup (Championship $championship)
+    {
+        $competitors = collect();
+
+        foreach ($championship->randomCompetitors as $competitor) {
+            $competitors->add($this->competitorService->addToGroup($championship, $competitor));
+        }
+
+        return $competitors;
+    }
+
+    public function winnerOfGroup(int $athlete_id, int $championship_id)
+    {
+        $competition = $this->competitorGroup->where([
+            'championship_id' => $championship_id,
+        ])
+        ->where(function ($where) use ($athlete_id) {
+            return $where->where('first_athlete_id', $athlete_id)
+                ->orWhere('second_athlete_id', $athlete_id);
+        })
+        ->whereNull('winner_athlete_id')
+        ->first();
+
+        if (!$competition)
+        {
+            throw new NotFoundRecord(__('validation.exists', [
+                'attribute' => __('validation.attributes.competition'),
+            ]));
+        }
+        $competition->update([ 'winner_athlete_id' => $athlete_id, ]);
+        return $this->competitorService->nextCompetition($competition);
     }
 
 }

@@ -8,6 +8,7 @@ use App\Helpers\Helpers;
 use App\Models\Athlete;
 use App\Models\Championship;
 use App\Models\Competitor;
+use App\Models\CompetitorGroups;
 use App\Services\Admin\ChampionshipService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -30,7 +31,7 @@ class ChampionshipServiceTest extends TestCase
         $this->assertDatabaseCount(Championship::class, 1);
     }
 
-    public function testShouldCreateChampionshipWhenHasConstraintInfoExistentEceptDate(): void
+    public function testShouldCreateChampionshipWhenHasConstraintInfoExistentExceptDate(): void
     {
         $title      = 'Campeonato da equipe KBRTec';
         $city_state = 'Santos, São Paulo';
@@ -66,7 +67,7 @@ class ChampionshipServiceTest extends TestCase
         // Exception test
         $this->expectException(DuplicateRecord::class);
         $this->expectExceptionMessage(__('validation.unique', [
-            'attribute' => 'title',
+            'attribute' => __('validation.attributes.title'),
         ]));
         $service->store($data);
     }
@@ -160,7 +161,7 @@ class ChampionshipServiceTest extends TestCase
         // Exception test
         $this->expectException(InvalidAttributeUpdateException::class);
         $this->expectExceptionMessage(__('validation.prohibited', [
-            'attribute' => 'code',
+            'attribute' => __('validation.attributes.code'),
         ]));
 
         $data = $service->update($champ->id, compact([
@@ -235,6 +236,273 @@ class ChampionshipServiceTest extends TestCase
         $this->assertDatabaseCount(Athlete::class, 1);
         $this->assertDatabaseHas(Competitor::class, $competitorExpected);
         $this->assertDatabaseCount(Competitor::class, 1);
+    }
+
+    public function ttestMustStartFightingPhaseForChampionship(): void
+    {
+        $championship = Championship::factory()->create([
+            'title' => 'Campeonato da KBRTec',
+            'city_state' => 'Santos, São Paulo',
+            'phase' => 'open_register'
+        ]);
+        $service = new ChampionshipService;
+
+        $service->startFighting($championship->id);
+
+        $this->assertDatabaseHas(Championship::class, [
+            'id' => $championship->id,
+            'phase' => 'fighting',
+        ]);
+        $this->assertDatabaseCount(Championship::class, 1);
+    }
+
+    public function testMustStartFightingPhaseForChampionshipAndCreateLightBrownMaleGroups(): void
+    {
+        $competitorCount = 10;
+        $championship = Championship::factory()->create([
+            'title' => 'Campeonato da KBRTec',
+            'city_state' => 'Santos, São Paulo',
+            'phase' => 'open_register'
+        ]);
+        $service = new ChampionshipService;
+        for ($i=0; $i < $competitorCount; $i++) {
+            $athlete = Athlete::factory()->create([
+                'gender' => 'male',
+                'belt'   => 'brown',
+                'weight' => 'light',
+            ]);
+            Competitor::factory()->create([
+                'belt'   => 'brown',
+                'weight' => 'light',
+                'team'   => $athlete->team,
+                "championship_id" => $championship->id,
+                "athlete_id"      => $athlete->id,
+
+            ]);
+        }
+
+        $champ = $service->startFighting($championship->id);
+
+        $this->assertDatabaseHas(Championship::class, [
+            'id' => $championship->id,
+            'phase' => 'fighting',
+        ]);
+        $this->assertDatabaseCount(Championship::class, 1);
+        $this->assertDatabaseCount(Competitor::class, $competitorCount);
+        $this->assertDatabaseCount(CompetitorGroups::class, ceil($competitorCount/2));
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 1,
+            'championship_id' => $championship->id,
+        ]);
+    }
+
+    public function testMustStartFightingPhaseForChampionshipWithTwoKindsOfGroup(): void
+    {
+        $competitorCount = 9;
+        $championship = Championship::factory()->create([
+            'title' => 'Campeonato da KBRTec',
+            'city_state' => 'Santos, São Paulo',
+            'phase' => 'open_register'
+        ]);
+        $service = new ChampionshipService;
+        for ($i=0; $i < $competitorCount; $i++) {
+            $athleteA = Athlete::factory()->create([
+                'gender' => 'male',
+                'belt'   => 'brown',
+                'weight' => 'light',
+            ]);
+            Competitor::factory()->create([
+                'belt'   => 'brown',
+                'weight' => 'light',
+                'team'   => $athleteA->team,
+                "championship_id" => $championship->id,
+                "athlete_id"      => $athleteA->id,
+
+            ]);
+        }
+
+        $athlete = Athlete::factory()->create([
+            'gender' => 'female',
+            'belt'   => 'black',
+            'weight' => 'strong',
+        ]);
+        Competitor::factory()->create([
+            'belt'   => 'black',
+            'weight' => 'strong',
+            'team'   => $athlete->team,
+            "championship_id" => $championship->id,
+            "athlete_id"      => $athlete->id,
+
+        ]);
+
+        $service->startFighting($championship->id);
+
+        $this->assertDatabaseHas(Championship::class, [
+            'id' => $championship->id,
+            'phase' => 'fighting',
+        ]);
+        $this->assertDatabaseCount(Championship::class, 1);
+        $this->assertDatabaseCount(Competitor::class, $competitorCount+1);
+        $this->assertDatabaseCount(CompetitorGroups::class, ceil($competitorCount/2)+1);
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 1,
+            'championship_id' => $championship->id,
+        ]);
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'first_athlete_id'  => $athlete->id,
+            'second_athlete_id' => null,
+            'belt'              => 'black',
+            'weight'            => 'strong',
+            'match_level'       => 1,
+            'championship_id'   => $championship->id,
+        ]);
+    }
+
+    public function testMustMarkAWinnerFighterForChampionshipWithTwoKindsOfGroup(): void
+    {
+        $competitorCount = 10;
+        $championship = Championship::factory()->create([
+            'title' => 'Campeonato da KBRTec',
+            'city_state' => 'Santos, São Paulo',
+            'phase' => 'open_register'
+        ]);
+        $service = new ChampionshipService;
+        for ($i=0; $i < $competitorCount; $i++) {
+            $athleteA = Athlete::factory()->create([
+                'gender' => 'male',
+                'belt'   => 'brown',
+                'weight' => 'light',
+            ]);
+            Competitor::factory()->create([
+                'belt'   => 'brown',
+                'weight' => 'light',
+                'team'   => $athleteA->team,
+                "championship_id" => $championship->id,
+                "athlete_id"      => $athleteA->id,
+
+            ]);
+        }
+
+        $service->startFighting($championship->id);
+        $service->winnerOfGroup($athleteA->id, $championship->id);
+
+        $this->assertDatabaseHas(Championship::class, [
+            'id' => $championship->id,
+            'phase' => 'fighting',
+        ]);
+        $this->assertDatabaseCount(Championship::class, 1);
+        $this->assertDatabaseCount(Competitor::class, $competitorCount);
+        $this->assertDatabaseCount(CompetitorGroups::class, ceil($competitorCount/2)+1);
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 1,
+            'championship_id' => $championship->id,
+        ]);
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 1,
+            'championship_id' => $championship->id,
+        ]);
+
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'              => 'brown',
+            'weight'            => 'light',
+            'match_level'       => 1,
+            'winner_athlete_id' => $athleteA->id,
+            'championship_id'   => $championship->id,
+        ]);
+
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 2,
+            'championship_id' => $championship->id,
+        ]);
+    }
+
+    public function testSmallCompetitionComplete(): void
+    {
+        $competitorCount = 4;
+        $championship = Championship::factory()->create([
+            'title' => 'Campeonato da KBRTec',
+            'city_state' => 'Santos, São Paulo',
+            'phase' => 'open_register'
+        ]);
+        $service = new ChampionshipService;
+        $teams = ['mugiwara', 'heart', 'red hair', 'barto club', 'tontatta', 'foxy'];
+
+        for ($i=0; $i < $competitorCount; $i++) {
+            $team = data_get($teams, random_int(0, count($teams)), $teams[0]);
+
+            $athlete = Athlete::factory()->create([
+                'gender' => 'male',
+                'belt'   => 'brown',
+                'weight' => 'light',
+                'team'   => $team,
+            ]);
+            Competitor::factory()->create([
+                'belt'   => 'brown',
+                'weight' => 'light',
+                'team'   => $team,
+                "championship_id" => $championship->id,
+                "athlete_id"      => $athlete->id,
+            ]);
+        }
+
+        $service->startFighting($championship->id);
+
+        $groups = CompetitorGroups::where([ 'championship_id' => $championship->id, 'match_level' => 1,])
+            ->get('first_athlete_id')->pluck('first_athlete_id')->toArray();
+
+        foreach ($groups as $i => $id) {
+            $service->winnerOfGroup($id, $championship->id);
+        }
+
+        $groups = CompetitorGroups::where([ 'championship_id' => $championship->id, 'match_level' => 2,])
+            ->get('first_athlete_id')->pluck('first_athlete_id')->toArray();
+
+        foreach ($groups as $i => $id) {
+            $service->winnerOfGroup($id, $championship->id);
+        }
+
+        $this->assertDatabaseHas(Championship::class, [
+            'id' => $championship->id,
+            'phase' => 'fighting',
+        ]);
+        $this->assertDatabaseCount(Championship::class, 1);
+        $this->assertDatabaseCount(Competitor::class, $competitorCount);
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 1,
+            'championship_id' => $championship->id,
+        ]);
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 1,
+            'championship_id' => $championship->id,
+        ]);
+
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'              => 'brown',
+            'weight'            => 'light',
+            'match_level'       => 1,
+            'championship_id'   => $championship->id,
+        ]);
+
+        $this->assertDatabaseHas(CompetitorGroups::class, [
+            'belt'            => 'brown',
+            'weight'          => 'light',
+            'match_level'     => 2,
+            'championship_id' => $championship->id,
+        ]);
     }
 
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AdminChampionshipController;
-use App\Http\Controllers\AthleteDashboardController;
+// use App\Http\Controllers\AthleteDashboardController;
 use App\Http\Controllers\HomeController;
 
 /*
@@ -21,6 +21,8 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/torneios', [HomeController::class, 'championships'])->name('home.championships');
 Route::get('/torneios/{championship}', [HomeController::class, 'showChampionship'])->name('home.championships.show');
+Route::get('/torneios/{championship}/registrar', [HomeController::class, 'registerChampionship'])->name('home.championships.create');
+Route::post('/torneios/{championship}/registrar', [HomeController::class, 'storeChampionship'])->name('home.championships.store');
 
 Route::resource('home', HomeController::class)->names('home');
 
@@ -37,6 +39,12 @@ Route::middleware('auth')->prefix('admin')->group(function ($routes) {
         Route::get('/', [AdminChampionshipController::class, 'listFeatures'])->name('admin.championship.features.index');
         Route::put('/{championship}', [AdminChampionshipController::class, 'updateFeatures'])->name('admin.championship.features.update');
     });
+
+    Route::prefix('championships/event')->group(function ($route) {
+        Route::put('/{championship}', [AdminChampionshipController::class, 'markAsGroupPhase'])->name('admin.championship.events.group');
+        Route::put('/{championship}/finish', [AdminChampionshipController::class, 'markAsFinished'])->name('admin.championship.events.finish');
+        Route::put('/{championship}/winner/{athlete_id}', [AdminChampionshipController::class, 'markWinner'])->name('admin.championship.event.mark-winner');
+    });
 });
 
 Route::get('/login', [AdminUserController::class, 'login'])->name('login');
@@ -47,3 +55,4 @@ Route::get('/reset-password', [AdminUserController::class, 'resetPassword'])->na
 Route::post('/request-password', [AdminUserController::class, 'requestPassword'])->name('request-new-password');
 Route::get('/reset-password/{token}', [AdminUserController::class, 'getResetPassword'])->middleware('guest')->name('password.reset');
 Route::post('/reset-password', [AdminUserController::class, 'postResetPassord'])->name('update.reset-password');
+Route::get('/download-csv/{championship_id}', [AdminChampionshipController::class, 'downloadCsv'])->name('download.csv');

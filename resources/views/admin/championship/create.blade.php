@@ -123,7 +123,7 @@
             <sup class="text-danger" title="obrigatório">*</sup>
         </label>
         <div class="col-sm-10 text-dark">
-            <textarea name="about"></textarea>
+            <textarea name="about">{{old('about')}}</textarea>
             @error('about')
                 <small class="bg-danger rounded py-1 px-2 mt-1 d-block text-light">{{ $message }}</small>
             @enderror
@@ -136,7 +136,7 @@
             <sup class="text-danger" title="obrigatório">*</sup>
         </label>
         <div class="col-sm-10 text-dark">
-            <textarea name="gym_place"></textarea>
+            <textarea name="gym_place">{{old('gym_place')}}</textarea>
             @error('gym_place')
                 <small class="bg-danger rounded py-1 px-2 mt-1 d-block text-light">{{ $message }}</small>
             @enderror
@@ -149,7 +149,7 @@
             <sup class="text-danger" title="obrigatório">*</sup>
         </label>
         <div class="col-sm-10 text-dark">
-            <textarea name="info"></textarea>
+            <textarea name="info">{{old('info')}}</textarea>
             @error('info')
                 <small class="bg-danger rounded py-1 px-2 mt-1 d-block text-light">{{ $message }}</small>
             @enderror
@@ -159,7 +159,7 @@
     <div class="mb-3 row">
         <label class="col-sm-2 col-form-label">Entrada ao Público</label>
         <div class="col-sm-10 text-dark">
-            <textarea name="public_entrance"></textarea>
+            <textarea name="public_entrance">{{old('public_entrance')}}</textarea>
             @error('public_entrance')
                 <small class="bg-danger rounded py-1 px-2 mt-1 d-block text-light">{{ $message }}</small>
             @enderror

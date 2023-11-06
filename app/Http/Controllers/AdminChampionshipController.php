@@ -10,6 +10,7 @@ use App\Services\Admin\ChampionshipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class AdminChampionshipController extends Controller
 {
@@ -50,6 +51,20 @@ class AdminChampionshipController extends Controller
         $user = auth()->user();
 
         return view('admin.championship.edit', compact([
+            'championship',
+            'user',
+        ]));
+    }
+
+    public function show (int $id)
+    {
+        $user = auth()->user();
+        $championship = $this->championshipService->getById($id, [
+            'competitors',
+            'groups',
+        ]);
+
+        return view('admin.championship.show', compact([
             'championship',
             'user',
         ]));
@@ -153,6 +168,95 @@ class AdminChampionshipController extends Controller
                 'error' => $th->getMessage(),
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function markAsGroupPhase (Request $request, int $championship_id )
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->championshipService->startFighting($championship_id);
+
+            DB::commit();
+            return response()->json([], JsonResponse::HTTP_OK);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $th->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function markAsFinished (Request $request, int $championship_id )
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->championshipService->endsCompetition($championship_id);
+
+            DB::commit();
+            return response()->json([], JsonResponse::HTTP_OK);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $th->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function markWinner (Request $request, int $championship_id, int $athlete_id )
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->championshipService->winnerOfGroup($athlete_id, $championship_id);
+
+            DB::commit();
+            return response()->json([], JsonResponse::HTTP_OK);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $th->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function downloadCsv (Request $request, int $championship_id )
+    {
+        $championship = $this->championshipService->getById($championship_id, [
+            'groups',
+        ]);
+
+        $headers = ['Content-Type' => 'text/csv'];
+        $dir_local = "/storage/temporary-csv";
+        $public_local = public_path().$dir_local;
+        $fname = "download-{$championship_id}.csv";
+        if (!File::exists($public_local)) {
+            File::makeDirectory($public_local);
+        }
+
+        $filename =  public_path("{$dir_local}/$fname");
+        $handle = fopen($filename, 'w');
+
+        fputcsv($handle, [
+            'luta',
+            'fase',
+            'competidores',
+            'vencedor',
+        ]);
+
+        foreach ($championship->groups as $item) {
+            fputcsv($handle, [
+                $item->match_number,
+                $item->match_level,
+                $item->firstAthlete->full_name . ' x ' . optional($item->secondAthlete)->full_name ?? '-',
+                optional($item->winner)->full_name ?? '-'
+            ]);
+
+        }
+        fclose($handle);
+
+        return response()->download($filename, $fname, $headers);
     }
 
 }

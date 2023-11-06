@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('team');
 
             $table->integer('championship_id')->unsigned();
-            $table->foreign('championship_id')->references('id')->on('championships');
+            // $table->foreign('championship_id')->references('id')->on('championships');
 
             $table->integer('athlete_id')->unsigned();
-            $table->foreign('athlete_id')->references('id')->on('athletes');
+            // $table->foreign('athlete_id')->references('id')->on('athletes');
 
             $table->timestamps();
         });

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundRecord;
+use App\Http\Requests\StoreAthleteRequest;
 use App\Services\Admin\ChampionshipService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -36,6 +39,48 @@ class HomeController extends Controller
 
     public function showChampionship(string $championship)
     {
+        $championship = $this->championshipService->getByCode($championship);
+
+        return view('athletes.admin.show', compact([
+            'championship',
+        ]));
+    }
+
+    public function registerChampionship(string $championship)
+    {
+        $championship = $this->championshipService->getByCode($championship);
+
+        return view('athletes.admin.create', compact([
+            'championship',
+        ]));
+    }
+
+    public function storeChampionship (StoreAthleteRequest $request, string $championshipCode )
+    {
+        DB::beginTransaction();
+
+        try {
+            if (!($championship = $this->championshipService->getByCode($championshipCode)))
+            {
+                throw new NotFoundRecord(__('validation.exists', [
+                    'attribute' => __('validation.attributes.championship'),
+                ]));
+            }
+
+            $competitor = $this->championshipService->registerCompetitor($request->validated(), $championship);
+            DB::commit();
+
+            return redirect()->back()->with([
+                'success' => 'Criado com sucesso',
+            ]); // ->withInput();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors([
+                'message' => $th->getMessage(),
+            ])->withInput();
+        }
+
     }
 
 }

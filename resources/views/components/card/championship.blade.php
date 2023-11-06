@@ -9,7 +9,7 @@
     <div class="p-3 relative">
         <div class="absolute -top-14 bg-white px-4 py-2 rounded-md shadow-md shadow-gray-500 text-center">
             <p class="text-2xl font-bold" data-calendar>{{ $championship->date->format('d') }}</p>
-            <p>{{ __($championship->date->format('M')) }}</p>
+            <p>{{ substr(__($championship->date->format('M')), 0, 3) }}</p>
         </div>
         @switch($championship->phase)
             @case('open_register')

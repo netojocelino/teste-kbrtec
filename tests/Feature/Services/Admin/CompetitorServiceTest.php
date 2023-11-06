@@ -50,9 +50,9 @@ class CompetitorServiceTest extends TestCase
 
         $this->expectException(ChampionshipClosesRegisterException::class);
         $this->expectExceptionMessage(__('validation.prohibited_unless', [
-            'attribute' => 'subscription',
-            'other'     => 'phase',
-            'values'    => 'open_register',
+            'attribute' => __('validation.attributes.subscription'),
+            'other'     => __('validation.attributes.phase'),
+            'values'    => __('validation.attributes.open_register'),
         ]));
         $service->store($athlete, $championship);
     }

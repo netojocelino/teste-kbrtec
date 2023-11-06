@@ -2,10 +2,10 @@
 
 namespace App\Services\Admin;
 
-use App\Exceptions\DuplicateRecord;
 use App\Exceptions\NotFoundRecord;
 use App\Helpers\Helpers;
 use App\Models\Athlete;
+use Illuminate\Support\Str;
 
 class AthleteService
 {
@@ -51,7 +51,7 @@ class AthleteService
 
         $athlete = $this->athlete->create([
             ...$attributes,
-            'code'            => data_get($data, 'code'),
+            'code'            => Str::slug(data_get($data, 'code') ?: data_get($data, 'full_name')),
             'password'        => bcrypt(data_get($data, 'password')),
         ]);
 
@@ -85,7 +85,7 @@ class AthleteService
         if(!($athlete = $this->getById($id)))
         {
             throw new NotFoundRecord(__('validation.exists', [
-                'attribute' => 'athlete',
+                'attribute' => __('validation.attributes.athlete'),
             ]));
         }
 

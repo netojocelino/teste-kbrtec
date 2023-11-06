@@ -193,9 +193,9 @@ return [
         'belt' => 'faixa',
         'gender' => 'Gênero',
         'weight' => 'Peso',
-        'subscription' => 'assinatura',
-        'open_register' => 'assinatura',
-
+        'subscription' => 'registro',
+        'open_register' => 'registro',
+        'competition' => 'grupo de luta',
     ],
 
 ];
